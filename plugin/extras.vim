@@ -1,9 +1,9 @@
 if has("nvim")
   " Because extras.lua is for nvim
-  return
+  finish
 endif
 if exists("g:loaded_vim_extras")
-  return
+  finish
 endif
 let g:loaded_vim_extras = 1
 

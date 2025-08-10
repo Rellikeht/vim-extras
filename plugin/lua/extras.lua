@@ -6,15 +6,55 @@ local extras = require("extras")
 
 -- general utilities {{{
 
-vim.fn["extras#count_on_command"] = function(fn, arg)
-  return function() for _ = 1, vim.v.count1 do fn(arg) end end
+-- roots {{{
+
+vim.g["extras#get_root"] = function(cmd, dir)
+  if dir == nil then return vim.g.systemlist(cmd)[1] end
+  return vim.fn.systemlist('cd '..dir..' && '..cmd)[1]
 end
 
-vim.fn["extras#get_netrw_fp"] = function()
+vim.g["extras#git_root"] = function(dir)
+  if dir == nil then dir = "" end
+  return vim.g["extras#get_root"]('git rev-parse --show-toplevel', dir)
+end
+
+vim.g["extras#hg_root"] = function(dir)
+  if dir == nil then dir = "" end
+  return vim.g["extras#get_root"]('hg root', dir)
+end
+
+vim.g["extras#part_root"] = function(dir)
+  if dir == nil then dir = "" end
+  return vim.g["extras#get_root"]("df -P . | awk '/^\\// {print $6}'", dir)
+end
+
+vim.g["extras#envrc_root"] = function(dir)
+  if dir == nil then dir = "" end
+  local root = vim.g["extras#get_root"](
+    'direnv status | '.."sed -En 's#Found RC path (.*)/[^/]*#\\1#p'",
+    dir
+  )
+  if root == '' then error('Not in direnv environment') end
+  return root
+end
+
+--  }}}
+
+-- comand helpers {{{
+
+vim.g["extras#count_on_function"] = function(fn, arg, name)
+  local name = name
+  if name == nil then
+    name = "count1"
+  end
+  return function() for _ = 1, vim.v[name] do fn(arg) end end
+end
+
+vim.g["extras#get_netrw_fp"] = function()
   return vim.b.netrw_curdir .. "/" .. vim.fn["netrw#Call"]("NetrwGetWord")
 end
 
-vim.fn["extras#command_on_expanded"] = function(command, args)
+vim.g["extras#command_on_expanded"] = function(command, args)
   local visited = {}
   for _, arg in pairs(args) do
     for _, file in pairs(vim.fn.split(vim.fn.expand(arg), "\n")) do
@@ -25,6 +65,16 @@ vim.fn["extras#command_on_expanded"] = function(command, args)
     end
   end
 end
+
+-- small helper for quicker (?) going several directories up
+vim.g.B = function(n)
+  if n == nil then
+    n = 1
+  end
+  return extras.repeat_str("../", n - 1) .. ".."
+end
+
+--  }}}
 
 -- TODO visual selection
 
@@ -68,17 +118,5 @@ vim.api.nvim_create_user_command(
     vim.fn["extras#command_on_expanded"]("badd", opts.fargs)
   end, { complete = "buffer", nargs = "*" }
 )
-
---  }}}
-
--- vim functions {{{
-
--- small helper for quicker (?) going several directories up
-vim.g.B = function(n)
-  if n == nil then
-    n = 1
-  end
-  return extras.repeat_str("../", n - 1) .. ".."
-end
 
 --  }}}

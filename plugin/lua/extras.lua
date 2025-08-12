@@ -4,13 +4,32 @@ end
 vim.g.loaded_vim_extras = true
 local extras = require("extras")
 
--- general utilities {{{
+-- lua specific utilities {{{
+
+vim.g["extras#escape_qargs"] = function(arg)
+  return vim.fn.escape(arg, "<%")
+end
+
+vim.g["extras#split_qargs"] = function(arg)
+  -- just in case (Tm)
+  -- "\\v(^|[^\\\\])(\\\\+)\\2\\zs |[^\\\\]\\zs "
+  -- TODO would this be enough
+  return vim.fn.split(vim.g["extras#escape_qargs"](arg), "[^\\]\\zs ")
+end
+
+--  }}}
+
+-- general utils {{{
+
+-- TODO visual selection
+
+--  }}}
 
 -- roots {{{
 
 vim.g["extras#get_root"] = function(cmd, dir)
   if dir == nil then return vim.g.systemlist(cmd)[1] end
-  return vim.fn.systemlist('cd '..dir..' && '..cmd)[1]
+  return vim.fn.systemlist('cd ' .. dir .. ' && ' .. cmd)[1]
 end
 
 vim.g["extras#git_root"] = function(dir)
@@ -31,7 +50,7 @@ end
 vim.g["extras#envrc_root"] = function(dir)
   if dir == nil then dir = "" end
   local root = vim.g["extras#get_root"](
-    'direnv status | '.."sed -En 's#Found RC path (.*)/[^/]*#\\1#p'",
+    'direnv status | ' .. "sed -En 's#Found RC path (.*)/[^/]*#\\1#p'",
     dir
   )
   if root == '' then error('Not in direnv environment') end
@@ -40,10 +59,29 @@ end
 
 --  }}}
 
+-- completion utils {{{
+
+vim.g["extras#list_completion_builder"] = function(list, lead, cmdline, curpos)
+  -- TODO
+end
+
+vim.g["extras#list_completion"] = function(list)
+  return function(lead, cmdline, curpos)
+    vim.g["extras#list_completion_builder"](list, lead, cmdline, curpos)
+  end
+end
+
+vim.g["extras#args_complete"] = function(lead, cmdline, cursorpos)
+  -- Completes files from arglist
+  local completions = vim.fn.getcompletion(lead, "arglist")
+  return extras.map(vim.fn.fnameescape, completions)
+end
+
+--  }}}
+
 -- comand helpers {{{
 
 vim.g["extras#count_on_function"] = function(fn, arg, name)
-  local name = name
   if name == nil then
     name = "count1"
   end
@@ -76,47 +114,50 @@ end
 
 --  }}}
 
--- TODO visual selection
-
---  }}}
-
 -- commands {{{
 
+local function tabopen_helper(opts)
+  vim.cmd(opts.count .. "tabnew")
+  vim.cmd("arglocal " .. vim.g["extras#escape_qargs"](opts.args))
+end
+
+local function user_command_helper(command, opts)
+  vim.g["extras#command_on_expanded"](
+    command,
+    vim.g["extras#split_qargs"](opts.args)
+  )
+end
+
 vim.api.nvim_create_user_command(
-  "TabOpen", function(opts)
-    local count = opts.count
-    if count == 0 then count = -1 end
-    vim.cmd(opts.count .. "tabnew")
-    local files = vim.fn.split(
-      opts.args,
-      -- just in case (Tm)
-      "\\v(^|[^\\\\])(\\\\+)\\2\\zs |[^\\\\]\\zs "
-      -- TODO would this be enough
-      -- "[^\\\\]\\zs "
-    )
-    vim.cmd.arglocal({
-      bang = true,
-      args = files,
-    })
-  end, { complete = "file", nargs = "*", count = 1 }
+  "TabOpen", tabopen_helper, { complete = "file", nargs = "*", count = 1 }
 )
 
 vim.api.nvim_create_user_command(
-  "BDelete", function(opts)
-    vim.fn["extras#command_on_expanded"]("bdelete", opts.fargs)
-  end, { complete = "buffer", nargs = "*" }
+  "TabOpenBuf", tabopen_helper, { complete = "buffer", nargs = "*", count = 1 }
 )
 
 vim.api.nvim_create_user_command(
-  "BWipeout", function(opts)
-    vim.fn["extras#command_on_expanded"]("bwipeout", opts.fargs)
-  end, { complete = "buffer", nargs = "*" }
+  "TabOpenArgs",
+  tabopen_helper,
+  { complete = vim.g["extras#args_complete"], nargs = "*", count = 1 }
 )
 
 vim.api.nvim_create_user_command(
-  "BAdd", function(opts)
-    vim.fn["extras#command_on_expanded"]("badd", opts.fargs)
-  end, { complete = "buffer", nargs = "*" }
+  "BDelete",
+  function(opts) user_command_helper("bdelete", opts) end,
+  { complete = "buffer", nargs = "*" }
+)
+
+vim.api.nvim_create_user_command(
+  "BWipeout",
+  function(opts) user_command_helper("bwipeout", opts) end,
+  { complete = "buffer", nargs = "*" }
+)
+
+vim.api.nvim_create_user_command(
+  "BAdd",
+  function(opts) user_command_helper("badd", opts) end,
+  { complete = "file", nargs = "*" }
 )
 
 --  }}}

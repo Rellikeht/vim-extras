@@ -10,7 +10,7 @@ let g:loaded_vim_extras = 1
 " vimscript specific utilities {{{
 
 function s:escape_qargs(arg) abort
-  return escape(a:arg, '<%')
+  return escape(a:arg, '<%#')
 endfunction
 
 function extras#split_qargs(arg) abort

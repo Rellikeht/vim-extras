@@ -69,16 +69,13 @@ local function map(func, table)
 end
 
 local function equal_recursive(t1, t2)
-  if #t1 ~= #t2 then
-    return false
-  end
   if type(t1) ~= "table" then
     if type(t1) ~= type(t2) or t1 ~= t2 then
       return false
     end
   end
   for k, v in pairs(t1) do
-    if not equal_recursive(t1[k], t2[k]) then
+    if not equal_recursive(v, t2[k]) then
       return false
     end
   end

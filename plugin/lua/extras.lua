@@ -7,7 +7,7 @@ local extras = require("extras")
 -- lua specific utilities {{{
 
 vim.g["extras#escape_qargs"] = function(arg)
-  return vim.fn.escape(arg, "<%")
+  return vim.fn.escape(arg, "<%#")
 end
 
 vim.g["extras#split_qargs"] = function(arg)

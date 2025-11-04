@@ -133,13 +133,13 @@ function s:tabopen_helper(count, args) abort
   exe "arglocal! ".a:args
 endfunction
 
-command! -nargs=* -count=1 -complete=file TabOpen
+command! -nargs=* -range=1 -addr=tabs -complete=file TabOpen
       \ call <SID>tabopen_helper(<count>, <SID>escape_qargs(<q-args>))
 
-command! -nargs=* -count=1 -complete=buffer TabOpenBuf
+command! -nargs=* -range=1 -addr=tabs -complete=buffer TabOpenBuf
       \ call <SID>tabopen_helper(<count>, <SID>escape_qargs(<q-args>))
 
-command! -nargs=* -count=1 -complete=customlist,extras#args_complete TabOpenArg
+command! -nargs=* -range=1 -addr=tabs -complete=customlist,extras#args_complete TabOpenArg
       \ call <SID>tabopen_helper(<count>, <SID>escape_qargs(<q-args>))
 
 command! -complete=buffer -nargs=* BDelete

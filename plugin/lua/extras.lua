@@ -117,7 +117,11 @@ end
 -- commands {{{
 
 local function tabopen_helper(opts)
-  vim.cmd(opts.count .. "tabnew")
+  local pos = opts.count
+  if opts.range == 0 then
+    pos = vim.fn.tabpagenr()
+  end
+  vim.cmd(pos .. "tabnew")
   vim.cmd("arglocal " .. vim.g["extras#escape_qargs"](opts.args))
 end
 
@@ -129,17 +133,31 @@ local function user_command_helper(command, opts)
 end
 
 vim.api.nvim_create_user_command(
-  "TabOpen", tabopen_helper, { complete = "file", nargs = "*", count = 1 }
+  "TabOpen", tabopen_helper, {
+    complete = "file",
+    nargs = "*",
+    range = 1,
+    addr = "tabs",
+  }
 )
 
 vim.api.nvim_create_user_command(
-  "TabOpenBuf", tabopen_helper, { complete = "buffer", nargs = "*", count = 1 }
+  "TabOpenBuf", tabopen_helper, {
+    complete = "buffer",
+    nargs = "*",
+    range = 1,
+    addr = "tabs",
+  }
 )
 
 vim.api.nvim_create_user_command(
   "TabOpenArgs",
-  tabopen_helper,
-  { complete = vim.g["extras#args_complete"], nargs = "*", count = 1 }
+  tabopen_helper, {
+    complete = vim.g["extras#args_complete"],
+    nargs = "*",
+    range = 1,
+    addr = "tabs",
+  }
 )
 
 vim.api.nvim_create_user_command(

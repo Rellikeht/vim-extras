@@ -128,10 +128,16 @@ endfunction
 
 " commands {{{
 
+" helpers {{{
+
 function s:tabopen_helper(count, args) abort
   exe a:count."tabnew"
   exe "arglocal! ".a:args
 endfunction
+
+" }}}
+
+" multi arg wrappers {{{
 
 command! -nargs=* -range=1 -addr=tabs -complete=file TabOpen
       \ call <SID>tabopen_helper(<count>, <SID>escape_qargs(<q-args>))
@@ -150,5 +156,18 @@ command! -complete=buffer -nargs=* BWipeout
 
 command! -complete=file -nargs=* BAdd
       \ call extras#command_on_expanded("badd", extras#split_qargs(<q-args>))
+
+" }}}
+
+" different completion versions {{{
+
+" }}}
+
+" other {{{
+
+command! -count=1 -nargs=1 -complete=option SetOptionCount
+      \ execute "set <args>=".((!v:count)?<count>:(v:count))
+
+" }}}
 
 " }}}

@@ -116,6 +116,8 @@ end
 
 -- commands {{{
 
+-- helpers {{{
+
 local function tabopen_helper(opts)
   local pos = opts.count
   if opts.range == 0 then
@@ -131,6 +133,10 @@ local function user_command_helper(command, opts)
     vim.g["extras#split_qargs"](opts.args)
   )
 end
+
+--  }}}
+
+--  {{{
 
 vim.api.nvim_create_user_command(
   "TabOpen", tabopen_helper, {
@@ -177,5 +183,29 @@ vim.api.nvim_create_user_command(
   function(opts) user_command_helper("badd", opts) end,
   { complete = "file", nargs = "*" }
 )
+
+--  }}}
+
+-- different completion versions {{{
+
+-- TODO
+
+-- }}}
+
+-- other {{{
+
+vim.api.nvim_create_user_command(
+  "SetOptionCount",
+  function(args)
+    local val = vim.v.count
+    if val == 0 then
+      val = args.count
+    end
+    vim.o[args.args] = val
+  end,
+  { nargs = 1, count = 1, complete = "option" }
+)
+
+--  }}}
 
 --  }}}

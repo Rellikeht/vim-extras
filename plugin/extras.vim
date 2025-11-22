@@ -160,6 +160,12 @@ command! -complete=file -nargs=* BAdd
 " }}}
 
 " different completion versions {{{
+" TODO oldfiles
+
+command! -nargs=? -complete=buffer SplitBuf split <args>
+command! -nargs=? -complete=arglist SplitArg split <args>
+command! -nargs=? -complete=buffer VsplitBuf vsplit <args>
+command! -nargs=? -complete=arglist VsplitArg vsplit <args>
 
 " }}}
 

@@ -157,7 +157,7 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_user_command(
-  "TabOpenArgs",
+  "TabOpenArg",
   tabopen_helper, {
     complete = vim.g["extras#args_complete"],
     nargs = "*",
@@ -188,7 +188,50 @@ vim.api.nvim_create_user_command(
 
 -- different completion versions {{{
 
--- TODO
+if vim.g.vscode then
+  vim.api.nvim_create_user_command(
+    "SplitBuf",
+    function(args) vim.cmd.Split(args.fargs) end,
+    { complete = "buffer", nargs = "?" }
+  )
+  vim.api.nvim_create_user_command(
+    "SplitArg",
+    function(args) vim.cmd.Split(args.fargs) end,
+    { complete = "arglist", nargs = "?" }
+  )
+  vim.api.nvim_create_user_command(
+    "VsplitBuf",
+    function(args) vim.cmd.Vsplit(args.fargs) end,
+    { complete = "buffer", nargs = "?" }
+  )
+  vim.api.nvim_create_user_command(
+    "VsplitArg",
+    function(args) vim.cmd.Vsplit(args.fargs) end,
+    { complete = "arglist", nargs = "?" }
+  )
+
+else
+  vim.api.nvim_create_user_command(
+    "SplitBuf",
+    function(args) vim.cmd.split(args.fargs) end,
+    { complete = "buffer", nargs = "?" }
+  )
+  vim.api.nvim_create_user_command(
+    "SplitArg",
+    function(args) vim.cmd.split(args.fargs) end,
+    { complete = "arglist", nargs = "?" }
+  )
+  vim.api.nvim_create_user_command(
+    "VsplitBuf",
+    function(args) vim.cmd.vsplit(args.fargs) end,
+    { complete = "buffer", nargs = "?" }
+  )
+  vim.api.nvim_create_user_command(
+    "VsplitArg",
+    function(args) vim.cmd.vsplit(args.fargs) end,
+    { complete = "arglist", nargs = "?" }
+  )
+end
 
 -- }}}
 

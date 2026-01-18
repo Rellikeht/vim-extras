@@ -4,6 +4,8 @@ end
 vim.g.loaded_vim_extras = true
 local extras = require("extras")
 
+-- TODO during pckr config functions vim.g (and vim.fn) aren't usable
+
 -- lua specific utilities {{{
 
 vim.g["extras#escape_qargs"] = function(arg)
@@ -209,7 +211,6 @@ if vim.g.vscode then
     function(args) vim.cmd.Vsplit(args.fargs) end,
     { complete = "arglist", nargs = "?" }
   )
-
 else
   vim.api.nvim_create_user_command(
     "SplitBuf",
@@ -237,6 +238,7 @@ end
 
 -- other {{{
 
+-- candidate for removal
 vim.api.nvim_create_user_command(
   "SetOptionCount",
   function(args)
@@ -250,5 +252,31 @@ vim.api.nvim_create_user_command(
 )
 
 --  }}}
+
+--  }}}
+
+-- quickfix/loclist {{{
+
+vim.api.nvim_create_user_command(
+  "CFilterCfile",
+  function(_)
+    if vim.cmd.Cfilter == nil then vim.cmd.packadd("cfilter") end
+    local file = vim.fn.expand("%")
+    if #file == 0 then file = vim.fn.expand("#") end
+    vim.cmd.Cfilter("/^" .. file .. "/")
+  end,
+  { nargs = 0 }
+)
+
+vim.api.nvim_create_user_command(
+  "LFilterCfile",
+  function(_)
+    if vim.cmd.Cfilter == nil then vim.cmd.packadd("cfilter") end
+    local file = vim.fn.expand("%")
+    if #file == 0 then file = vim.fn.expand("#") end
+    vim.cmd.Lfilter("/^" .. file .. "/")
+  end,
+  { nargs = 0 }
+)
 
 --  }}}

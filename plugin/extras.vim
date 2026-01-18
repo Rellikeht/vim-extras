@@ -177,3 +177,28 @@ command! -count=1 -nargs=1 -complete=option SetOptionCount
 " }}}
 
 " }}}
+
+" quickfix/loclist {{{
+
+function s:CFilterCfile() abort
+  if exists(":Cfilter") == 0
+    packadd cfilter
+  endif
+  let l:file = expand("%")
+  let l:file = (l:file == "") ? expand("#") : l:file
+  exe "Cfilter /^".l:file."/"
+endfunction
+
+function s:LFilterCfile() abort
+  if exists(":Cfilter") == 0
+    packadd cfilter
+  endif
+  let l:file = expand("%")
+  let l:file = (l:file == "") ? expand("#") : l:file
+  exe "Lfilter /^".l:file."/"
+endfunction
+
+command! CFilterCfile call s:CFilterCfile()
+command! LFilterCfile call s:LFilterCfile()
+
+" }}}

@@ -257,6 +257,8 @@ vim.api.nvim_create_user_command(
 
 -- quickfix/loclist {{{
 
+-- leaving only elements from current file
+
 vim.api.nvim_create_user_command(
   "CFilterCfile",
   function(_)
@@ -277,6 +279,38 @@ vim.api.nvim_create_user_command(
     vim.cmd.Lfilter("/^" .. file .. "/")
   end,
   { nargs = 0 }
+)
+
+-- making list of files given by command
+
+local function prepare_qf_elements(cmd)
+  return vim.fn.map(
+    vim.fn.split(vim.fn.system(cmd), "\n"),
+    function(_, val)
+      return { filename = val, text = val }
+    end
+  )
+end
+
+-- helper for populating quickfix with file list from system command
+vim.g["extras#csysexpr"] = function(cmd)
+  vim.fn.setqflist(prepare_qf_elements(cmd), "r")
+end
+
+vim.g["extras#lsysexpr"] = function(cmd)
+  vim.fn.setloclist(0, prepare_qf_elements(cmd), "r")
+end
+
+vim.api.nvim_create_user_command(
+  "LSysExpr",
+  function(args) vim.g["extras#lsysexpr"](args.fargs[1]) end,
+  { nargs = 1, complete = "shellcmdline" }
+)
+
+vim.api.nvim_create_user_command(
+  "CSysExpr",
+  function(args) vim.g["extras#csysexpr"](args.fargs[1]) end,
+  { nargs = 1, complete = "shellcmdline" }
 )
 
 --  }}}

@@ -180,6 +180,8 @@ command! -count=1 -nargs=1 -complete=option SetOptionCount
 
 " quickfix/loclist {{{
 
+" leaving only elements from current file
+
 function s:CFilterCfile() abort
   if exists(":Cfilter") == 0
     packadd cfilter
@@ -200,5 +202,29 @@ endfunction
 
 command! CFilterCfile call s:CFilterCfile()
 command! LFilterCfile call s:LFilterCfile()
+
+" making list of files given by command
+
+function s:prepare_qf_elements(cmd) abort
+  return map(
+    \ split(system(a:cmd), "\n"),
+    \ "{'filename': v:val, 'text': v:val}"
+  \ )
+endfunction
+
+" helper for populating quickfix with file list from system command
+function extras#csysexpr(cmd) abort
+  call setqflist(s:prepare_qf_elements(a:cmd), "r")
+endfunction
+
+function extras#lsysexpr(cmd) abort
+  call setloclist(0, s:prepare_qf_elements(a:cmd), "r")
+endfunction
+
+command! -nargs=1 -complete=shellcmdline CSysExpr
+      \ call extras#csysexpr(<f-args>)
+
+command! -nargs=1 -complete=shellcmdline LSysExpr
+      \ call extras#lsysexpr(<f-args>)
 
 " }}}

@@ -221,10 +221,18 @@ function extras#lsysexpr(cmd) abort
   call setloclist(0, s:prepare_qf_elements(a:cmd), "r")
 endfunction
 
-command! -nargs=1 -complete=shellcmdline CSysExpr
-      \ call extras#csysexpr(<f-args>)
+if has("nvim") || v:version >= 900
 
-command! -nargs=1 -complete=shellcmdline LSysExpr
-      \ call extras#lsysexpr(<f-args>)
+  command! -nargs=1 -complete=shellcmdline CSysExpr
+        \ call extras#csysexpr(<f-args>)
+  command! -nargs=1 -complete=shellcmdline LSysExpr
+        \ call extras#lsysexpr(<f-args>)
+else
+
+  command! -nargs=1 -complete=shellcmd CSysExpr
+        \ call extras#csysexpr(<f-args>)
+  command! -nargs=1 -complete=shellcmd LSysExpr
+        \ call extras#lsysexpr(<f-args>)
+endif
 
 " }}}

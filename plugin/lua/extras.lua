@@ -27,7 +27,7 @@ end
 
 --  }}}
 
--- roots {{{
+-- project roots {{{
 
 vim.g["extras#get_root"] = function(cmd, dir)
   if dir == nil then return vim.g.systemlist(cmd)[1] end
@@ -301,16 +301,19 @@ vim.g["extras#lsysexpr"] = function(cmd)
   vim.fn.setloclist(0, prepare_qf_elements(cmd), "r")
 end
 
+local shellcmd_complete = "shellcmd"
+if vim.fn.has("nvim-0.11") == 1 then
+  shellcmd_complete = "shellcmdline"
+end
 vim.api.nvim_create_user_command(
   "LSysExpr",
   function(args) vim.g["extras#lsysexpr"](args.fargs[1]) end,
-  { nargs = 1, complete = "shellcmdline" }
+  { nargs = 1, complete = shellcmd_complete }
 )
-
 vim.api.nvim_create_user_command(
   "CSysExpr",
   function(args) vim.g["extras#csysexpr"](args.fargs[1]) end,
-  { nargs = 1, complete = "shellcmdline" }
+  { nargs = 1, complete = shellcmd_complete }
 )
 
 --  }}}

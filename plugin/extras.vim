@@ -23,7 +23,7 @@ endfunction
 
 " }}}
 
-" roots {{{
+" project roots {{{
 
 function extras#get_root(cmd, dir='') abort
   if a:dir == ''
@@ -221,7 +221,7 @@ function extras#lsysexpr(cmd) abort
   call setloclist(0, s:prepare_qf_elements(a:cmd), "r")
 endfunction
 
-if has("nvim") || v:version >= 900
+if v:version >= 900 || has("nvim-0.11")
 
   command! -nargs=1 -complete=shellcmdline CSysExpr
         \ call extras#csysexpr(<f-args>)

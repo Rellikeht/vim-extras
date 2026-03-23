@@ -238,22 +238,9 @@ end
 
 -- other {{{
 
--- candidate for removal
-vim.api.nvim_create_user_command(
-  "SetOptionCount",
-  function(args)
-    local val = vim.v.count
-    if val == 0 then
-      val = args.count
-    end
-    vim.o[args.args] = val
-  end,
-  { nargs = 1, count = 1, complete = "option" }
-)
-
 vim.api.nvim_create_user_command(
   "FileDo",
-  [[bufdo<bang> if &buftype == "" | <args> | endif ]],
+  [[ bufdo<bang> if &buftype == "" | <args> | endif ]],
   {
     nargs = 1,
     range = "%",

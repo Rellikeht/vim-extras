@@ -174,6 +174,9 @@ command! -nargs=? -complete=arglist VsplitArg vsplit <args>
 command! -count=1 -nargs=1 -complete=option SetOptionCount
       \ execute "set <args>=".((!v:count)?<count>:(v:count))
 
+command! -nargs=1 -complete=command -range=% -addr=buffers -bang FileDo
+      \ bufdo<bang> if &buftype == "" | <args> | endif
+
 " }}}
 
 " }}}

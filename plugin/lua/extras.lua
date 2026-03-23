@@ -251,6 +251,18 @@ vim.api.nvim_create_user_command(
   { nargs = 1, count = 1, complete = "option" }
 )
 
+vim.api.nvim_create_user_command(
+  "FileDo",
+  [[bufdo<bang> if &buftype == "" | <args> | endif ]],
+  {
+    nargs = 1,
+    range = "%",
+    addr = "buffers",
+    complete = "command",
+    bang = true,
+  }
+)
+
 --  }}}
 
 --  }}}

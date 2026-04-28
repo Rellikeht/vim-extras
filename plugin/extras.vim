@@ -205,20 +205,24 @@ command! LFilterCfile call s:LFilterCfile()
 
 " making list of files given by command
 
-function s:prepare_qf_elements(cmd) abort
+function extras#qf_cmd_elems(cmd) abort
   return map(
     \ split(system(a:cmd), "\n"),
     \ "{'filename': v:val, 'text': v:val}"
   \ )
 endfunction
 
+function extras#qf_files(list) abort
+  return map(deepcopy(a:list), 'v:val.":1: "')
+endfunction
+
 " helper for populating quickfix with file list from system command
 function extras#csysexpr(cmd) abort
-  call setqflist(s:prepare_qf_elements(a:cmd), "r")
+  call setqflist(extras#qf_cmd_elems(a:cmd), "r")
 endfunction
 
 function extras#lsysexpr(cmd) abort
-  call setloclist(0, s:prepare_qf_elements(a:cmd), "r")
+  call setloclist(0, extras#qf_cmd_elems(a:cmd), "r")
 endfunction
 
 if v:version >= 900 || has("nvim-0.11")

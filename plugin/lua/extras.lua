@@ -282,7 +282,7 @@ vim.api.nvim_create_user_command(
 
 -- making list of files given by command
 
-local function prepare_qf_elements(cmd)
+vim.g["extras#qf_cmd_elems"] = function(cmd)
   return vim.fn.map(
     vim.fn.split(vim.fn.system(cmd), "\n"),
     function(_, val)
@@ -291,13 +291,17 @@ local function prepare_qf_elements(cmd)
   )
 end
 
+vim.g["extras#qf_files"] = function(list)
+  return vim.fn.map(list, function(_, val) return val .. ":1: " end)
+end
+
 -- helper for populating quickfix with file list from system command
 vim.g["extras#csysexpr"] = function(cmd)
-  vim.fn.setqflist(prepare_qf_elements(cmd), "r")
+  vim.fn.setqflist(vim.g["extras#qf_cmd_elems"](cmd), "r")
 end
 
 vim.g["extras#lsysexpr"] = function(cmd)
-  vim.fn.setloclist(0, prepare_qf_elements(cmd), "r")
+  vim.fn.setloclist(0, vim.g["extras#qf_cmd_elems"](cmd), "r")
 end
 
 local shellcmd_complete = "shellcmd"
